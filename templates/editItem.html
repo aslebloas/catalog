@@ -8,7 +8,7 @@
   <div id="form" class="col-md-8 col-md-offset-2">
     <h1>Edit the {{ item.name }}</h1>
 
-    <form action="#" method='POST' class="form-horizontal">
+    <form action="#" method='POST' class="form-horizontal" enctype="multipart/form-data">
       <div class="form-group">
         <label class="col-sm-2 control-label">Name:</label>
         <div class="col-sm-10">
@@ -28,9 +28,9 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="col-sm-2 control-label">Image Url:</label>
+        <label class="col-sm-2 control-label">Image:</label>
         <div class="col-sm-10">
-          <input type="file" name="image" value="{{ item.image }}" required>
+          <input type="file" name="image" value="{{ item.image }}">
         </div>
       </div>
       <div class="form-group">

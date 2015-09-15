@@ -428,12 +428,11 @@ def editItem(category_id, item_id):
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            editedItem.image = url_for('uploaded_file', filename=filename)
         if request.form['name']:
             editedItem.name = bleach.clean(request.form['name'])
-        if request.form['image']:
-            editedItem.image = url_for('uploaded_file', filename=filename)
         if request.form['description']:
-            editedItem.image = bleach.clean(request.form['description'])
+            editedItem.description = bleach.clean(request.form['description'])
         if request.form['date']:
             editedItem.date = bleach.clean(request.form['date'])
         session.add(editedItem)

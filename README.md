@@ -20,6 +20,7 @@ Sign in
   * item.html
   * items.html
   * login.html
+  * navbar.html
   * newCategory.html
   * newItem.html
 * client_secrets.json
@@ -51,7 +52,7 @@ flask-seasurf is required.
 
 To get started:
 
-git clone git://github.com/aslebloas/catalog.git
+git clone git://github.com/aslebloas/bucketlist-catalog.git
 cd catalog
 python project.py
 Access and test your application by visiting http://localhost:8000 locally
