@@ -21,6 +21,7 @@ class Category(Base):
     image = Column(Text, nullable=True)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
+    items = relationship("Item", backref="category")
 
     @property
     def serialize(self):
@@ -29,7 +30,22 @@ class Category(Base):
             'id': self.id,
             'name': self.name,
             'user_id': self.user_id,
+            'items': [item.serialize for item in self.items]
         }
+
+    def serializeToXml(self, content):
+        content.append("<Category>")
+        content.append("<ID>%s</ID>" % self.id)
+        content.append("<Name>%s</Name>" % self.name)
+        content.append("<ImageUrl>%s</ImageUrl>" % self.image)
+
+        if self.items:
+            content.append("<Item>")
+            for item in self.items:
+                item.serializeToXml(content)
+            content.append("</Item>")
+
+        content.append("</Category>")
 
 
 class Item(Base):
@@ -40,7 +56,6 @@ class Item(Base):
     date = Column(String(8), nullable=False)
     image = Column(Text, nullable=False)
     category_id = Column(Integer, ForeignKey('category.id'))
-    category = relationship(Category)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
@@ -52,11 +67,19 @@ class Item(Base):
             'name': self.name,
             'description': self.description,
             'date': self.date,
-            'occasion': self.occasion,
             'image': self.image,
             'category_id': self.category_id,
             'user_id': self.user_id,
         }
+
+    def serializeToXml(self, content):
+        content.append("<Item>")
+        content.append("<ID>%s</ID>" % self.id)
+        content.append("<Name>%s</Name>" % self.name)
+        content.append("<Description>%s</Description>" % self.description)
+        content.append("<Date>%s</Date>" % self.date)
+        content.append("<ImageUrl>%s</ImageUrl>" % self.image)
+        content.append("</Item>")
 
 # insert at end of file
 engine = create_engine('sqlite:///items.db')

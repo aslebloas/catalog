@@ -3,7 +3,7 @@
 
 This Catalog Bucketlist is a web application which enables the users to browse some lifetime goals and add their owns.
 Unlogged users can browse categories and goals, but they need to be logged in to create new ones and they must be their creators to edit and delete them.
-Sign in 
+
 
 ## Folder Structure
 
@@ -23,9 +23,11 @@ Sign in
   * navbar.html
   * newCategory.html
   * newItem.html
+* UPLOAD_FOLDER
 * client_secrets.json
 * database_setup.py
 * fb_client_secrets.json
+* firstmigration.py
 * project.py
 * README.md
 
@@ -55,12 +57,14 @@ To get started:
 git clone git://github.com/aslebloas/bucketlist-catalog.git
 cd catalog
 python project.py
+python firstmigration.py # if you want to begin with some data
 Access and test your application by visiting http://localhost:8000 locally
+
 
 ## API Endpoints
 I have created a JSON APIs to view Categories and Items information.
 It is available at '/catalog/JSON'
 
-## License
 
+## License
 Open Source

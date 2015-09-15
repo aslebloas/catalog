@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Catalog - Another Bucketlist</title>
+</head>
+<body>
+    <ul>
+    {% for c in categories %}
+        <li>{{ c.name }}</a></li>
+    {% endfor %}
+    </ul>
+
+    <h1>My Webpage</h1>
+    {{ a_variable }}
+
+    {# a comment #}
+</body>
+</html>

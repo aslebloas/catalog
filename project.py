@@ -1,5 +1,6 @@
 import bleach
 import os
+
 from database_setup import Base, Category, Item, User
 from flask import Flask, flash, jsonify
 from flask import redirect, render_template, request, url_for, make_response
@@ -17,22 +18,27 @@ import random
 import requests
 import string
 
+app = Flask(__name__)
+
+# FILE UPLOAD
 UPLOAD_FOLDER = 'UPLOAD_FOLDER/'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
-
-app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024
+
+# Cross-site request forgery prevention
 csrf = SeaSurf(app)
 
+# JSON
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
+
+
 APPLICATION_NAME = "Catalog"
 
 # Connect to Database and create database session
 engine = create_engine('sqlite:///items.db')
 Base.metadata.bind = engine
-
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
@@ -56,7 +62,7 @@ def showLogin():
     # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
 
-
+# facebook login
 @csrf.exempt
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
@@ -72,7 +78,7 @@ def fbconnect():
         'web']['app_id']
     app_secret = json.loads(
         open('fb_client_secrets.json', 'r').read())['web']['app_secret']
-    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (  # noqa
         app_id, app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
@@ -81,7 +87,6 @@ def fbconnect():
     userinfo_url = "https://graph.facebook.com/v2.4/me"
     # strip expire tag from access token
     token = result.split("&")[0]
-
 
     url = 'https://graph.facebook.com/v2.4/me?%s&fields=name,id,email' % token
     h = httplib2.Http()
@@ -94,12 +99,13 @@ def fbconnect():
     login_session['email'] = data["email"]
     login_session['facebook_id'] = data["id"]
 
-    # The token must be stored in the login_session in order to properly logout, let's strip out the information before the equals sign in our token
+    """ The token must be stored in the login_session in order to properly logout,
+    let's strip out the information before the equals sign in our token """
     stored_token = token.split("=")[1]
     login_session['access_token'] = stored_token
 
     # Get user picture
-    url = 'https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200&width=200' % token
+    url = 'https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200&width=200' % token  # noqa
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
@@ -119,23 +125,26 @@ def fbconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '  # noqa
 
     flash("Now logged in as %s" % login_session['username'])
     return output
 
 
+# facebook logout
 @app.route('/fbdisconnect')
 def fbdisconnect():
     facebook_id = login_session['facebook_id']
     # The access token must me included to successfully logout
     access_token = login_session['access_token']
-    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (
+        facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
-    return "function myFunction() {alert('You have been successfully logged out'); window.location.href = '/';}</script><body onload='myFunction()'>"
+    return "function myFunction() {alert('You have been successfully logged out'); window.location.href = '/';}</script><body onload='myFunction()'>"  # noqa
 
 
+# google login
 @csrf.exempt
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -190,8 +199,8 @@ def gconnect():
     stored_credentials = login_session.get('credentials')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_credentials is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(
+            json.dumps('Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -224,7 +233,7 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '  # noqa
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -253,7 +262,7 @@ def getUserID(email):
         return None
 
 
-# DISCONNECT - Revoke a current user's token and reset their login_session
+# Google logout - Revoke a current user's token and reset their login_session
 @app.route('/gdisconnect')
 def gdisconnect():
     # Only disconnect a connected user.
@@ -318,7 +327,7 @@ def newCategory():
         file = request.files['image']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))      
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         newCategory = Category(
             name=bleach.clean(request.form['name']),
             image=url_for('uploaded_file', filename=filename),
@@ -359,7 +368,7 @@ def deleteCategory(category_id):
     if 'username' not in login_session:
         return redirect('/login')
     if categoryToDelete.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to delete this category.'); window.location.href = '/';}</script><body onload='myFunction()'>"
+        return "<script>function myFunction() {alert('You are not authorized to delete this category.'); window.location.href = '/';}</script><body onload='myFunction()'>"  # noqa
     if request.method == 'POST':
         session.delete(categoryToDelete)
         flash('%s successfully deleted!' % categoryToDelete.name)
@@ -443,6 +452,7 @@ def editItem(category_id, item_id):
                            item=editedItem,
                            category_id=category_id)
 
+
 # Delete an item from a category
 @app.route('/catalog/<int:category_id>/<int:item_id>/delete',
            methods=['GET', 'POST'])
@@ -459,7 +469,7 @@ def deleteItem(category_id, item_id):
     return render_template('deleteItem.html', item=itemToDelete)
 
 
-# JSON APIs to view Categories and Items information
+# JSON API to view Categories and Items information
 @app.route('/catalog/JSON')
 def catalogJSON():
     categories = session.query(Category).all()
@@ -474,6 +484,21 @@ def catalogJSON():
         serializedCategories.append(nextCategory)
     return jsonify(categories=[serializedCategories])
 
+
+# XML API to view Categories and Items information
+@app.route('/catalog/XML')
+def catalogXML():
+    """Returns the catalog as XML document."""
+
+    content = []
+    content.append("<Categories>")
+
+    categories = session.query(Category).all()
+    for category in categories:
+        category.serializeToXml(content)
+    content.append("</Categories>")
+
+    return str.join("\n", content), 200, {'Content-Type': 'text/xml'}
 
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
