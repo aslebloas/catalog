@@ -62,9 +62,10 @@ Access and test your application by visiting http://localhost:8000 locally
 
 
 ## API Endpoints
-I have created a JSON APIs to view Categories and Items information.
+I have created a JSON API endpoint to view Categories and Items information.
 It is available at '/catalog/JSON'
-
+I have created a XML API endpoint to view Categories and Items information.
+It is available at '/catalog/XML'
 
 ## License
 Open Source

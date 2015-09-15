@@ -62,6 +62,7 @@ def showLogin():
     # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
 
+
 # facebook login
 @csrf.exempt
 @app.route('/fbconnect', methods=['POST'])
@@ -489,7 +490,6 @@ def catalogJSON():
 @app.route('/catalog/XML')
 def catalogXML():
     """Returns the catalog as XML document."""
-
     content = []
     content.append("<Categories>")
 
