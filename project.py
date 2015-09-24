@@ -313,7 +313,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'username' not in login_session:
-            return redirect(url_for('login', next=request.url))
+            return redirect(url_for('showLogin'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -380,7 +380,8 @@ def deleteCategory(category_id):
         return "<script>function myFunction() {alert('You are not authorized to delete this category.'); window.location.href = '/';}</script><body onload='myFunction()'>"  # noqa
     if request.method == 'POST':
         session.delete(categoryToDelete)
-        session.delete(itemsToDelete)
+        for item in itemsToDelete:
+            session.delete(item)
         flash('%s successfully deleted!' % categoryToDelete.name)
         session.commit()
         return redirect(url_for('showCategories'))
