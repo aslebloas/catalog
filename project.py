@@ -7,6 +7,7 @@ from flask import redirect, render_template, request, url_for, make_response
 from flask import send_from_directory
 from flask import session as login_session
 from flask.ext.seasurf import SeaSurf
+from functools import wraps
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
@@ -206,7 +207,7 @@ def gconnect():
         return response
 
     # Store the access token in the session for later use.
-    login_session['credentials'] = credentials
+    login_session['credentials'] = credentials.to_json()
     login_session['gplus_id'] = gplus_id
 
     # Get user info
@@ -308,6 +309,14 @@ def disconnect():
         return redirect(url_for('showCategories'))
 
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in login_session:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
 # show all categories
 @app.route('/')
 @app.route('/catalog/')
@@ -321,9 +330,8 @@ def showCategories():
 
 # Create New Category for logged in user otherwise redirect to login page
 @app.route('/catalog/new', methods=['GET', 'POST'])
+@login_required
 def newCategory():
-    if 'username' not in login_session:
-        return redirect('/login')
     if request.method == 'POST':
         file = request.files['image']
         if file and allowed_file(file.filename):
@@ -342,9 +350,8 @@ def newCategory():
 
 # Edit Category
 @app.route('/catalog/<int:category_id>/edit', methods=['GET', 'POST'])
+@login_required
 def editCategory(category_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     editedCategory = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
         file = request.files['image']
@@ -364,14 +371,16 @@ def editCategory(category_id):
 
 # Delete Category
 @app.route('/catalog/<int:category_id>/delete', methods=['GET', 'POST'])
+@login_required
 def deleteCategory(category_id):
     categoryToDelete = session.query(Category).filter_by(id=category_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
+    itemsToDelete = session.query(Item).filter_by(
+        category_id=category_id).all()
     if categoryToDelete.user_id != login_session['user_id']:
         return "<script>function myFunction() {alert('You are not authorized to delete this category.'); window.location.href = '/';}</script><body onload='myFunction()'>"  # noqa
     if request.method == 'POST':
         session.delete(categoryToDelete)
+        session.delete(itemsToDelete)
         flash('%s successfully deleted!' % categoryToDelete.name)
         session.commit()
         return redirect(url_for('showCategories'))
@@ -403,9 +412,8 @@ def showItem(category_id, item_id):
 
 # Create an item from a category
 @app.route('/catalog/<int:category_id>/items/new', methods=['GET', 'POST'])
+@login_required
 def newItem(category_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     category = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
         file = request.files['image']
@@ -428,9 +436,8 @@ def newItem(category_id):
 # Edit an item from a category
 @app.route('/catalog/<int:category_id>/<int:item_id>/edit',
            methods=['GET', 'POST'])
+@login_required
 def editItem(category_id, item_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     category = session.query(Category).filter_by(id=category_id).one()
     editedItem = session.query(Item).filter_by(id=item_id).one()
     if request.method == 'POST':
@@ -457,9 +464,8 @@ def editItem(category_id, item_id):
 # Delete an item from a category
 @app.route('/catalog/<int:category_id>/<int:item_id>/delete',
            methods=['GET', 'POST'])
+@login_required
 def deleteItem(category_id, item_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     category = session.query(Category).filter_by(id=category_id).one()
     itemToDelete = session.query(Item).filter_by(id=item_id).one()
     if request.method == 'POST':
