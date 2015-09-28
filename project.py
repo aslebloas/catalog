@@ -1,13 +1,30 @@
-import bleach
+#!/usr/bin/env python
+"""
+project.py -- Bucketlist Catalog for Udacity Full Stack Web Dev Nanodegree
+
+The classes used are the User, Category and Item.
+Items belongs to one Category but one Category can have many items.
+The deletion of categories imply the deletion of their children items.
+
+created by Anne-Sophie Sept 2015
+
+"""
+
+import json
 import os
 
+import bleach
+import requests
+
 from database_setup import Base, Category, Item, User
-from dict2xml import dict2xml as xmlify
+
 from flask import Flask, flash, jsonify
 from flask import redirect, render_template, request, url_for, make_response
 from flask import send_from_directory
 from flask import session as login_session
 from flask.ext.seasurf import SeaSurf
+
+from dict2xml import dict2xml as xmlify
 from functools import wraps
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 from sqlalchemy import create_engine, asc
@@ -15,9 +32,9 @@ from sqlalchemy.orm import sessionmaker
 from werkzeug import secure_filename
 
 import httplib2
-import json
+
 import random
-import requests
+
 import string
 
 # setup flask
@@ -376,14 +393,10 @@ def editCategory(category_id):
 @login_required
 def deleteCategory(category_id):
     categoryToDelete = session.query(Category).filter_by(id=category_id).one()
-    itemsToDelete = session.query(Item).filter_by(
-        category_id=category_id).all()
     if categoryToDelete.user_id != login_session['user_id']:
         return "<script>function myFunction() {alert('You are not authorized to delete this category.'); window.location.href = '/';}</script><body onload='myFunction()'>"  # noqa
     if request.method == 'POST':
         session.delete(categoryToDelete)
-        for item in itemsToDelete:
-            session.delete(item)
         flash('%s successfully deleted!' % categoryToDelete.name)
         session.commit()
         return redirect(url_for('showCategories'))
@@ -507,3 +520,5 @@ if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
     app.run(host='0.0.0.0', port=8000)
+
+__author__ = 'aslebloas@gmail.com (Anne-Sophie Le Bloas)'
