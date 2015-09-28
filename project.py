@@ -2,6 +2,7 @@ import bleach
 import os
 
 from database_setup import Base, Category, Item, User
+from dict2xml import dict2xml as xmlify
 from flask import Flask, flash, jsonify
 from flask import redirect, render_template, request, url_for, make_response
 from flask import send_from_directory
@@ -19,6 +20,7 @@ import random
 import requests
 import string
 
+# setup flask
 app = Flask(__name__)
 
 # FILE UPLOAD
@@ -497,15 +499,9 @@ def catalogJSON():
 @app.route('/catalog/XML')
 def catalogXML():
     """Returns the catalog as XML document."""
-    content = []
-    content.append("<Categories>")
+    content = session.query(Category).all()
+    return xmlify({'content': [c.serialize for c in content]})
 
-    categories = session.query(Category).all()
-    for category in categories:
-        category.serializeToXml(content)
-    content.append("</Categories>")
-
-    return str.join("\n", content), 200, {'Content-Type': 'text/xml'}
 
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'

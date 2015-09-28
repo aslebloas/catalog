@@ -45,22 +45,25 @@ Item correspond here to goals, but if you modify the front-end, it can be anythi
 
 ## Installation
 
+```
 Python 2.7.9 is required.
 Bleach is required.
 PostgreSQL is required.
 Flask 0.9 or above is required.
 sqlalchemy is required.
 flask-seasurf is required.
+dict2xml is required.
+```
 
 To get started:
-
+```
 git clone git://github.com/aslebloas/bucketlist-catalog.git
 cd catalog
 python project.py
 python database_setup.py
 python firstmigration.py # if you want to begin with some data
 Access and test your application by visiting http://localhost:8000 locally
-
+```
 
 ## API Endpoints
 I have created a JSON API endpoint to view Categories and Items information.
