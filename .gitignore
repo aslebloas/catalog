@@ -1,0 +1,10 @@
+# Client Secret and first migration #
+###################
+*.json
+
+
+# Logs and databases #
+######################
+*.db
+*.pyc
+*.sqlite
