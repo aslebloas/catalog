@@ -11,7 +11,7 @@
 
 # Setuptools distribution folder #
 ###################
-instances/
+/instances/*
 
 # Python egg metadata, regenerated from source files by setuptools #
 ###################
