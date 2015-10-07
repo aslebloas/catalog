@@ -82,6 +82,6 @@ class Item(Base):
         content.append("</Item>")
 
 # insert at end of file
-engine = create_engine('sqlite:///items.db')
+engine = create_engine('postgresql://catalog:udacity@localhost/items')
 
 Base.metadata.create_all(engine)

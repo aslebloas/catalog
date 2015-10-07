@@ -1,24 +1,13 @@
-#!/usr/bin/env python
-"""
-project.py -- Bucketlist Catalog for Udacity Full Stack Web Dev Nanodegree
-
-The classes used are the User, Category and Item.
-Items belongs to one Category but one Category can have many items.
-The deletion of categories imply the deletion of their children items.
-
-created by Anne-Sophie Sept 2015
-
-"""
+from catalog import app
 
 import json
 import os
-
 import bleach
 import requests
 
-from database_setup import Base, Category, Item, User
+from models import Base, Category, Item, User
 
-from flask import Flask, flash, jsonify
+from flask import flash, jsonify
 from flask import redirect, render_template, request, url_for, make_response
 from flask import send_from_directory
 from flask import session as login_session
@@ -36,9 +25,6 @@ import httplib2
 import random
 
 import string
-
-# setup flask
-app = Flask(__name__)
 
 # FILE UPLOAD
 UPLOAD_FOLDER = 'UPLOAD_FOLDER/'
@@ -514,11 +500,3 @@ def catalogXML():
     """Returns the catalog as XML document."""
     content = session.query(Category).all()
     return xmlify({'content': [c.serialize for c in content]})
-
-
-if __name__ == '__main__':
-    app.secret_key = 'super_secret_key'
-    app.debug = True
-    app.run(host='0.0.0.0', port=8000)
-
-__author__ = 'aslebloas@gmail.com (Anne-Sophie Le Bloas)'

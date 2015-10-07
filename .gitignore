@@ -3,8 +3,17 @@
 *.json
 
 
-# Logs and databases #
+# Compiled python modules #
 ######################
 *.db
 *.pyc
 *.sqlite
+
+# Setuptools distribution folder #
+###################
+/dist/
+/instance/
+
+# Python egg metadata, regenerated from source files by setuptools #
+###################
+/*.egg-info
