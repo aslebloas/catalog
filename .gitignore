@@ -2,6 +2,9 @@
 ###################
 *.json
 
+# 
+*.wsgi
+
 
 # Compiled python modules #
 ######################

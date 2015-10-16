@@ -9,11 +9,12 @@ The deletion of categories imply the deletion of their children items.
 created by Anne-Sophie Sept 2015
 
 """
+APPLICATION_NAME = "Catalog"
 
 # setup flask
 from flask import Flask
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='')
 # Access to the configuration variables via app.config["VAR_NAME"]
 app.config.from_object('config')
 app.config.from_pyfile('../config.py')

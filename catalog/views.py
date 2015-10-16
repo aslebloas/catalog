@@ -37,10 +37,8 @@ csrf = SeaSurf(app)
 
 # JSON
 CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
+    app.open_resource('static/client_secrets.json').read())['web']['client_id']
 
-
-APPLICATION_NAME = "Catalog"
 
 # Connect to Database and create database session
 engine = create_engine('sqlite:///items.db')

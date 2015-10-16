@@ -38,11 +38,11 @@ This Catalog Bucketlist website has been created as a project for Udacity Full S
 
 ## Notes to Reviewer
 
-IP address: 52.24.136.23
+IP address: 52.27.60.9
 
 SSH port: 2200
 
-Complete URL: http://ec2-52-24-136-23.us-west-2.compute.amazonaws.com/
+Complete URL: http://ec2-52-27-60-9.us-west-2.compute.amazonaws.com/
 
 ## Further Development
 I have created it as standard as possible so it can be easily reused.

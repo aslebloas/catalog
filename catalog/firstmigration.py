@@ -7,7 +7,7 @@ import json
 import os
 
 
-engine = create_engine('sqlite:///items.db')
+engine = create_engine('postgresql://catalog:udacity@localhost/items')
 # Bind the engine to the metadata of the Base class so that the
 # declaratives can be accessed through a DBSession instance
 Base.metadata.bind = engine
